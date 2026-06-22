@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model comments {
+  id        BigInt   @id(map: "Table Comments_pkey") @default(autoincrement())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  reportId  BigInt?
+  name      String?
+  userId    String?  @db.Uuid
+  text      String?
+  reports   reports? @relation(fields: [reportId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comments_report_id_fkey")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reports {
+  id          BigInt     @id(map: "Tabel Reports_pkey") @default(autoincrement())
+  date        DateTime   @db.Date
+  tema        String?
+  images      Json?
+  likes       BigInt?
+  createdAt   DateTime?  @db.Timestamptz(6)
+  description String?
+  comments    comments[]
+}

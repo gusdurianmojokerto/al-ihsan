@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Portal Laporan - Rumah Belajar Al Ihsan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+        }
+
+        body { 
+            background: radial-gradient(circle at top left, #eff6ff 0%, #ffffff 40%, #e0f2fe 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            min-height: 100vh;
+            color: #1e293b;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            /* Performa scroll & Rendering */
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Optimasi Background Blobs dengan GPU Acceleration */
+        .bg-blob {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.12;
+            will-change: transform;
+            transform: translateZ(0);
+            pointer-events: none;
+        }
+
+        .blob-1 { top: -100px; left: -100px; background: var(--primary); }
+        .blob-2 { bottom: -100px; right: -100px; background: var(--secondary); }
+        .blob-3 { top: 20%; right: -50px; background: var(--accent); width: 300px; height: 300px; }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .animate-fade-in { 
+            animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-btn {
+            padding: 12px;
+            border-radius: 16px;
+            color: #64748b;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .shimmer-text {
+            background: linear-gradient(90deg, #1d4ed8, #0ea5e9, #1d4ed8);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .custom-shadow {
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Optimasi render card saat scroll */
+        .report-card-container {
+            content-visibility: auto;
+            contain-intrinsic-size: 400px;
+        }
+
+        .image-aspect-box {
+            position: relative;
+            width: 100%;
+            padding-top: 75%; /* 4:3 Aspect Ratio */
+            background-color: #e2e8f0;
+            overflow: hidden;
+            border-radius: 2rem;
+        }
+
+        .image-aspect-box img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s ease, transform 0.6s ease;
+        }
+
+        .description-text {
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: #475569;
+            text-align: justify;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .contact-card {
+            transition: transform 0.2s ease;
+        }
+        .contact-card:active {
+            transform: scale(0.97);
+        }
+
+        /* Loading Spinner Smooth */
+        .spinner-custom {
+            border: 4px solid rgba(37, 99, 235, 0.1);
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="pb-10">
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+
+    <!-- Loader -->
+    <div id="loading" class="fixed inset-0 flex items-center justify-center bg-white/95 backdrop-blur-xl z-[200] transition-opacity duration-500">
+        <div class="flex flex-col items-center">
+            <div class="relative w-28 h-28 flex items-center justify-center">
+                <div class="absolute inset-0 border-[6px] border-blue-100 rounded-3xl rotate-45"></div>
+                <div class="absolute inset-0 border-[6px] border-blue-500 border-t-transparent rounded-3xl animate-spin rotate-45"></div>
+                <img src="https://ik.imagekit.io/fuagv7oun/background-removed-background-removed.png" class="w-16 h-16 object-contain relative z-10" alt="Logo" decoding="async">
+            </div>
+            <div class="mt-8 text-center">
+                <h2 class="text-xs font-extrabold uppercase tracking-[0.3em] shimmer-text">Rumah Belajar Al Ihsan</h2>
+                <div class="h-1 w-12 bg-blue-500 mx-auto mt-2 rounded-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app"></div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+        const SUPABASE_URL = 'https://dphnwhleycntavygvbfh.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwaG53aGxleWNudGF2eWd2YmZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxODQ5NTAsImV4cCI6MjA4ODc2MDk1MH0.ezXfcfR5kKMXyIL0IhRCPBSVf0Gf_Crlco62jxhiU-Q';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        const LOGO_URL = "https://ik.imagekit.io/fuagv7oun/background-removed-background-removed.png";
+
+        let state = {
+            isAdmin: localStorage.getItem('al_ihsan_is_admin') === 'true',
+            activeTab: 'home',
+            selectedPostId: null,
+            isEditMode: false,
+            editData: null,
+            reports: [],
+            comments: [],
+            filterMonth: "all",
+            filterYear: "all",
+            previews: [],
+            files: [],
+            userName: localStorage.getItem('al_ihsan_name') || "",
+            loading: true
+        };
+
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        // --- Core Helpers ---
+        function showToast(msg) {
+            const existing = document.querySelector('.toast-notif');
+            if (existing) existing.remove();
+            const t = document.createElement('div');
+            t.className = 'toast-notif fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest z-[250] animate-fade-in border border-white/10 shadow-2xl text-center min-w-[240px]';
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { 
+                t.style.opacity = '0';
+                t.style.transform = 'translate(-50%, 10px)';
+                setTimeout(() => t.remove(), 400);
+            }, 3000);
+        }
+
+        const processImage = (file) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (readerEvent) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            const MAX_SIZE = 1000;
+                            let width = img.width;
+                            let height = img.height;
+                            if (width > height) { if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } } 
+                            else { if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } }
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.imageSmoothingEnabled = true;
+                            ctx.imageSmoothingQuality = 'high';
+                            ctx.drawImage(img, 0, 0, width, height);
+                            canvas.toBlob((blob) => {
+                                if (blob) resolve(blob);
+                                else resolve(file);
+                            }, 'image/jpeg', 0.8);
+                        } catch (e) { resolve(file); }
+                    };
+                    img.onerror = () => resolve(file);
+                    img.src = readerEvent.target.result;
+                };
+                reader.onerror = () => resolve(file);
+            });
+        };
+
+        const init = async () => {
+            try {
+                const [r, c] = await Promise.all([
+                    supabase.from('reports').select('*').order('date', { ascending: false }),
+                    supabase.from('comments').select('*').order('createdAt', { ascending: true })
+                ]);
+                state.reports = r.data || [];
+                state.comments = c.data || [];
+            } catch (e) {
+                console.error("Initialization Error:", e);
+            } finally {
+                state.loading = false;
+                render();
+                const loader = document.getElementById('loading');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }
+            }
+        };
+
+        // --- GLOBAL ACTIONS ---
+        window.setTab = (t) => {
+            state.activeTab = t;
+            state.selectedPostId = null;
+            state.isEditMode = false;
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.viewDetail = (id) => {
+            state.selectedPostId = id;
+            state.activeTab = 'detail';
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.handleFilterMonth = (val) => {
+            state.filterMonth = val;
+            render();
+        };
+
+        window.handleFilterYear = (val) => {
+            state.filterYear = val;
+            render();
+        };
+
+        window.handleLike = async (id) => {
+            const report = state.reports.find(r => r.id == id);
+            if (!report) return;
+            const newLikes = (report.likes || 0) + 1;
+            report.likes = newLikes;
+            render();
+            const { error } = await supabase.from('reports').update({ likes: newLikes }).eq('id', id);
+            if (error) init(); 
+        };
+
+        window.handleComment = async (e, id) => {
+            e.preventDefault();
+            const text = e.target.comment.value.trim();
+            const name = state.userName || e.target.name?.value.trim();
+            if (!text || !name) return;
+            
+            const submitBtn = e.target.querySelector('button');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
+
+            if (!state.userName) {
+                state.userName = name;
+                localStorage.setItem('al_ihsan_name', name);
+            }
+            
+            const { error } = await supabase.from('comments').insert([{ reportId: id, name, text, createdAt: new Date().toISOString() }]);
+            
+            if (error) {
+                await supabase.from('comments').insert([{ report_id: id, name, text, createdAt: new Date().toISOString() }]);
+            }
+            
+            e.target.reset();
+            showToast("Komentar terkirim!");
+            init();
+        };
+
+        window.handleFileSelect = (e) => {
+            const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+            if (files.length > 5) {
+                showToast("Maksimal 5 foto!");
+                e.target.value = "";
+                return;
+            }
+            state.files = files;
+            state.previews = files.map(f => URL.createObjectURL(f));
+            render();
+        };
+
+        window.handleSubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            
+            try {
+                let imageUrls = state.isEditMode ? [...state.editData.images] : [];
+                
+                if (state.files.length > 0) {
+                    if (!state.isEditMode) imageUrls = []; 
+                    for (let i = 0; i < state.files.length; i++) {
+                        const file = state.files[i];
+                        btn.innerHTML = `<span class="animate-spin inline-block mr-2">◌</span> Kompres Foto ${i+1}...`;
+                        
+                        const finalBlob = await processImage(file);
+                        const fileName = `alihsan_${Date.now()}_${Math.random().toString(36).substr(2, 5)}.jpg`;
+                        
+                        btn.innerHTML = `<span class="animate-spin inline-block mr-2">◌</span> Unggah Foto ${i+1}...`;
+                        const { error: uploadError } = await supabase.storage.from('images').upload(fileName, finalBlob, { contentType: 'image/jpeg' });
+                        
+                        if (uploadError) throw uploadError;
+                        const { data } = supabase.storage.from('images').getPublicUrl(fileName);
+                        imageUrls.push(data.publicUrl);
+                    }
+                }
+
+                const payload = {
+                    date: e.target.date.value,
+                    tema: e.target.tema.value,
+                    description: e.target.description.value,
+                    images: imageUrls
+                };
+
+                btn.innerHTML = `<span class="animate-spin inline-block mr-2">◌</span> Finalisasi...`;
+                if (state.isEditMode) {
+                    const { error } = await supabase.from('reports').update(payload).eq('id', state.editData.id);
+                    if (error) throw error;
+                    showToast("Laporan diperbarui!");
+                } else {
+                    const { error } = await supabase.from('reports').insert([{ ...payload, likes: 0, createdAt: new Date().toISOString() }]);
+                    if (error) throw error;
+                    showToast("Laporan berhasil terbit!");
+                }
+
+                state.files = []; 
+                state.previews = []; 
+                state.activeTab = 'home';
+                state.isEditMode = false;
+                init();
+            } catch (err) {
+                showToast("Gagal: " + err.message);
+                btn.disabled = false;
+                btn.innerText = "Coba Lagi";
+            }
+        };
+
+        window.startEdit = (id) => {
+            state.editData = state.reports.find(r => r.id == id);
+            state.isEditMode = true;
+            state.activeTab = 'admin';
+            render();
+        };
+
+        window.handleDelete = async (id) => {
+            if (confirm("Hapus laporan ini secara permanen?")) {
+                const { error } = await supabase.from('reports').delete().eq('id', id);
+                if (error) showToast("Gagal menghapus");
+                else {
+                    showToast("Laporan dihapus");
+                    init();
+                }
+            }
+        };
+
+        window.handleAdminLogin = () => {
+            const pass = document.getElementById('pass-input').value.toLowerCase();
+            if (pass === 'gusdurian') {
+                state.isAdmin = true;
+                localStorage.setItem('al_ihsan_is_admin', 'true');
+                showToast("Selamat Datang, Pengurus!");
+                render();
+            } else {
+                showToast("Kode akses salah!");
+            }
+        };
+
+        window.handleAdminLogout = () => {
+            state.isAdmin = false;
+            localStorage.removeItem('al_ihsan_is_admin');
+            state.activeTab = 'home';
+            showToast("Anda telah keluar");
+            render();
+        };
+
+        const getAvailableYears = () => {
+            const years = state.reports.map(r => {
+                if (!r.date) return null;
+                return r.date.toString().substring(0, 4);
+            }).filter(y => y && y.length === 4);
+            return [...new Set(years)].sort((a, b) => b - a);
+        };
+
+        const Navbar = () => `
+            <div class="fixed top-0 left-0 right-0 z-50 px-4 pt-4 pointer-events-none">
+                <nav class="max-w-7xl mx-auto glass rounded-[2rem] h-20 flex items-center justify-between px-6 custom-shadow pointer-events-auto">
+                    <div class="flex items-center gap-3.5 cursor-pointer" onclick="window.setTab('home')">
+                        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center p-1 shadow-sm border border-blue-100/50">
+                            <img src="${LOGO_URL}" class="w-full h-full object-contain" alt="Logo" decoding="async">
+                        </div>
+                        <div>
+                            <h1 class="text-base font-extrabold tracking-tight leading-none text-blue-600">AL IHSAN</h1>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Rumah Belajar</p>
+                        </div>
+                    </div>
+                    <div class="flex bg-slate-100/50 p-1 rounded-2xl">
+                        <button onclick="window.setTab('home')" class="nav-btn ${state.activeTab === 'home' ? 'active' : ''}">
+                            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="window.setTab('about')" class="nav-btn ${state.activeTab === 'about' ? 'active' : ''}">
+                            <i data-lucide="info" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="window.setTab('admin')" class="nav-btn ${state.activeTab === 'admin' ? 'active' : ''}">
+                            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </nav>
+            </div>
+            <div class="h-28"></div>
+        `;
+
+        const ReportCard = (r) => {
+            const commentCount = state.comments.filter(c => (c.reportId || c.report_id) == r.id).length;
+            const displayDate = new Date(r.date + 'T00:00:00');
+            return `
+                <div class="report-card-container animate-fade-in">
+                    <div class="bg-white/75 backdrop-blur-sm border border-white rounded-[2.5rem] overflow-hidden custom-shadow group h-full flex flex-col justify-between">
+                        <div>
+                            <div class="p-4 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                                    </div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${displayDate.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</p>
+                                </div>
+                                ${state.isAdmin ? `
+                                    <div class="flex gap-2">
+                                        <button onclick="window.startEdit('${r.id}')" class="p-2 text-blue-500 bg-blue-50 rounded-xl active:scale-90 transition-transform"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                                        <button onclick="window.handleDelete('${r.id}')" class="p-2 text-red-500 bg-red-50 rounded-xl active:scale-90 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <div onclick="window.viewDetail('${r.id}')" class="px-4 cursor-pointer">
+                                <div class="image-aspect-box">
+                                    <img src="${r.images?.[0] || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1000'}" 
+                                         class="group-hover:scale-105" 
+                                         loading="lazy"
+                                         decoding="async"
+                                         onload="this.style.opacity='1'"
+                                         style="opacity: 0;">
+                                    ${r.images?.length > 1 ? `
+                                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                                            <i data-lucide="layers" class="w-3 h-3 text-blue-600"></i>
+                                            <span class="text-[10px] font-bold text-slate-600">${r.images.length} Foto</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div class="py-4">
+                                    <h3 class="text-base font-extrabold text-slate-800 leading-snug mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">${r.tema}</h3>
+                                    <p class="text-xs text-slate-500 line-clamp-3 leading-relaxed">${r.description}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-4 pb-5 flex items-center justify-between border-t border-slate-50 pt-3 mt-auto">
+                            <div class="flex items-center gap-4">
+                                <button onclick="window.handleLike('${r.id}')" class="flex items-center gap-1.5 group/btn">
+                                    <div class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 transition-all active:scale-125">
+                                        <i data-lucide="heart" class="w-3.5 h-3.5 ${r.likes > 0 ? 'fill-rose-500' : ''}"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-600">${r.likes || 0}</span>
+                                </button>
+                                <div onclick="window.viewDetail('${r.id}')" class="flex items-center gap-1.5 cursor-pointer">
+                                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                                        <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-600">${commentCount}</span>
+                                </div>
+                            </div>
+                            <button onclick="window.viewDetail('${r.id}')" class="text-[9px] font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-2 rounded-xl hover:bg-blue-100 transition-colors">Detail</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        const render = () => {
+            window.requestAnimationFrame(() => {
+                const root = document.getElementById('app');
+                if (!root) return;
+                
+                let contentHtml = Navbar();
+
+                if (state.activeTab === 'home') {
+                    const filtered = state.reports.filter(r => {
+                        if (!r.date) return false;
+                        const dateStr = r.date.toString();
+                        const year = dateStr.substring(0, 4);
+                        const month = parseInt(dateStr.substring(5, 7), 10).toString();
+                        
+                        const matchM = state.filterMonth === "all" || state.filterMonth.toString() === month;
+                        const matchY = state.filterYear === "all" || state.filterYear.toString() === year;
+                        return matchM && matchY;
+                    });
+
+                    const availableYears = getAvailableYears();
+
+                    contentHtml += `
+                        <div class="max-w-7xl mx-auto px-5 pb-20">
+                            <header class="mb-8 text-center">
+                                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-800 mb-3">Membangun <span class="shimmer-text">Masa Depan</span></h2>
+                                <p class="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">Melihat kembali senyum dan semangat belajar adik-adik Al Ihsan</p>
+                            </header>
+
+                            <div class="flex gap-3 pb-8 justify-center sticky top-24 z-40 px-2 pointer-events-none">
+                                <select onchange="window.handleFilterMonth(this.value)" class="glass pointer-events-auto border-none rounded-2xl px-5 pr-10 py-3 text-[10px] font-extrabold shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer">
+                                    <option value="all">Semua Bulan</option>
+                                    ${months.map((m,i) => `<option value="${i+1}" ${state.filterMonth == (i+1) ? 'selected':''}>${m}</option>`).join('')}
+                                </select>
+                                <select onchange="window.handleFilterYear(this.value)" class="glass pointer-events-auto border-none rounded-2xl px-5 pr-10 py-3 text-[10px] font-extrabold shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer">
+                                    <option value="all">Semua Tahun</option>
+                                    ${availableYears.map(y => `<option value="${y}" ${state.filterYear == y ? 'selected':''}>${y}</option>`).join('')}
+                                </select>
+                            </div>
+
+                            ${filtered.length > 0 ? `
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    ${filtered.map(r => ReportCard(r)).join('')}
+                                </div>
+                            ` : `
+                                <div class="py-20 text-center flex flex-col items-center opacity-40">
+                                    <i data-lucide="search-x" class="w-12 h-12 mb-4 text-slate-300"></i>
+                                    <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Laporan tidak ditemukan</p>
+                                </div>
+                            `}
+                        </div>
+                    `;
+                } else if (state.activeTab === 'detail') {
+                    const r = state.reports.find(p => p.id == state.selectedPostId);
+                    if (!r) { window.setTab('home'); return; }
+                    const rComments = state.comments.filter(c => (c.reportId || c.report_id) == r.id);
+                    contentHtml += `
+                        <div class="max-w-3xl mx-auto px-5 pb-20 animate-fade-in">
+                            <button onclick="window.setTab('home')" class="mb-6 flex items-center gap-2 text-slate-400 hover:text-blue-600 font-bold text-xs uppercase tracking-widest active:translate-x-[-5px] transition-all"><i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali</button>
+                            <div class="bg-white rounded-[3rem] overflow-hidden custom-shadow p-6 sm:p-8 mb-8">
+                                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-4 leading-snug">${r.tema}</h1>
+                                <div class="flex flex-wrap items-center gap-4 mb-6">
+                                    <div class="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase tracking-wider">${new Date(r.date + 'T00:00:00').toLocaleDateString('id-ID', {dateStyle:'long'})}</div>
+                                    <div class="flex items-center gap-1.5 text-slate-400"><i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500 fill-rose-500"></i><span class="text-[10px] font-bold text-slate-500">${r.likes} Disukai</span></div>
+                                </div>
+                                <div class="flex overflow-x-auto snap-x snap-mandatory gap-4 no-scrollbar mb-8 -mx-2 px-2">
+                                    ${r.images.map(img => `
+                                        <div class="flex-none w-[92%] sm:w-[85%] snap-center rounded-[2rem] overflow-hidden aspect-[4/3] bg-slate-100 shadow-lg">
+                                            <img src="${img}" class="w-full h-full object-cover" loading="eager" decoding="async">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="description-text text-slate-600 mb-4 px-2 text-sm sm:text-base">${r.description}</div>
+                            </div>
+
+                            <div class="bg-white rounded-[3rem] p-6 sm:p-8 custom-shadow">
+                                <h4 class="font-extrabold text-slate-800 mb-6 flex items-center gap-2"><i data-lucide="message-circle" class="w-5 h-5 text-blue-500"></i>Tanggapan (${rComments.length})</h4>
+                                <div class="space-y-6 mb-10">
+                                    ${rComments.map(c => `
+                                        <div class="flex gap-4">
+                                            <div class="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center font-bold text-slate-400 text-xs">${c.name ? c.name[0].toUpperCase() : 'A'}</div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between mb-1">
+                                                    <p class="text-xs font-extrabold text-slate-800">${c.name}</p>
+                                                    <p class="text-[9px] font-bold text-slate-400">${new Date(c.createdAt).toLocaleDateString('id-ID')}</p>
+                                                </div>
+                                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${c.text}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <form onsubmit="window.handleComment(event, '${r.id}')" class="space-y-4">
+                                    ${!state.userName ? `<input type="text" name="name" placeholder="Nama Lengkap" required class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500">` : `<p class="text-xs font-bold text-blue-600 px-2">Balas sebagai: ${state.userName}</p>`}
+                                    <div class="relative">
+                                        <textarea name="comment" placeholder="Tulis komentar..." required rows="3" class="w-full bg-slate-50 border-none rounded-[2rem] px-5 py-5 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                        <button type="submit" class="absolute bottom-4 right-4 bg-blue-600 text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i data-lucide="send" class="w-5 h-5"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    `;
+                } else if (state.activeTab === 'about') {
+                    contentHtml += `
+                        <div class="max-w-3xl mx-auto px-5 pb-20 animate-fade-in">
+                            <div class="bg-white rounded-[3rem] p-8 sm:p-12 custom-shadow mb-8 text-center relative overflow-hidden">
+                                <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-50 rounded-full"></div>
+                                <div class="w-32 h-32 bg-white rounded-[2.5rem] shadow-xl flex items-center justify-center mx-auto mb-8 p-3 relative z-10 border border-blue-50">
+                                    <img src="${LOGO_URL}" class="w-full h-full object-contain" alt="Logo" decoding="async">
+                                </div>
+                                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-4 tracking-tight">Rumah Belajar Al Ihsan</h2>
+                                <p class="text-[10px] font-extrabold text-blue-600 uppercase tracking-[0.4em] mb-10">Gusdurian Mojokerto</p>
+                                <div class="space-y-6 text-sm sm:text-base text-slate-600 text-justify leading-relaxed">
+                                    <p><span class="font-extrabold text-blue-600">Rumah Belajar Al Ihsan</span> merupakan oase pendidikan non-formal yang didirikan di bawah naungan semangat komunitas Gusdurian Mojokerto.</p>
+                                    <p>Dengan memegang teguh 9 Nilai Utama Gus Dur, kami berfokus pada pengembangan karakter anak-anak melalui metode pembelajaran yang humanis, menyenangkan, dan penuh toleransi.</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h4 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.2em] ml-6 mb-2">Hubungi Kami</h4>
+                                
+                                <a href="https://instagram.com/gusdurian_mojokerto" target="_blank" class="contact-card flex items-center gap-5 bg-white p-5 rounded-[2rem] custom-shadow group">
+                                    <div class="w-14 h-14 bg-gradient-to-tr from-purple-500 via-pink-500 to-orange-400 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                        <i data-lucide="instagram" class="w-7 h-7"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Instagram Resmi</p>
+                                        <p class="text-sm font-extrabold text-slate-800">@gusdurian_mojokerto</p>
+                                    </div>
+                                    <i data-lucide="external-link" class="w-5 h-5 text-slate-200 group-hover:text-blue-500 transition-colors mr-2"></i>
+                                </a>
+
+                                <a href="https://wa.me/6285961567378" target="_blank" class="contact-card flex items-center gap-5 bg-white p-5 rounded-[2rem] custom-shadow group">
+                                    <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                        <i data-lucide="phone" class="w-7 h-7"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">WhatsApp Penggerak</p>
+                                        <p class="text-sm font-extrabold text-slate-800">Hubungi Kami Langsung</p>
+                                    </div>
+                                    <div class="bg-blue-50 text-blue-600 text-[8px] font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-tight mr-1">Aktif</div>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else if (state.activeTab === 'admin') {
+                    if (!state.isAdmin) {
+                        contentHtml += `
+                            <div class="max-w-xs mx-auto py-20 px-5 text-center">
+                                <div class="bg-white rounded-[3rem] p-10 custom-shadow">
+                                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-blue-500"><i data-lucide="shield-check" class="w-8 h-8"></i></div>
+                                    <h2 class="font-extrabold text-lg mb-6 text-slate-800 uppercase tracking-widest leading-tight">Keamanan<br>Pengurus</h2>
+                                    <input type="password" id="pass-input" placeholder="KODE AKSES" class="w-full bg-slate-50 border-none rounded-2xl p-5 text-center text-xl font-extrabold mb-4 outline-none focus:ring-2 focus:ring-blue-500 tracking-[0.3em] transition-all">
+                                    <button onclick="window.handleAdminLogin()" class="w-full bg-blue-600 text-white font-extrabold py-5 rounded-2xl shadow-xl shadow-blue-100 text-xs tracking-widest uppercase active:scale-95 transition-all">Verifikasi</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        contentHtml += `
+                            <div class="max-w-3xl mx-auto px-5 pb-20">
+                                <div class="flex justify-between items-center mb-8 bg-white/50 p-4 rounded-3xl">
+                                    <div class="flex items-center gap-3"><div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white"><i data-lucide="user-check" class="w-4 h-4"></i></div><p class="text-xs font-extrabold text-slate-700">Mode Pengurus</p></div>
+                                    <button onclick="window.handleAdminLogout()" class="text-[9px] font-bold text-red-500 bg-red-50 border border-red-100 px-4 py-2 rounded-xl uppercase tracking-tighter">Keluar</button>
+                                </div>
+                                <form onsubmit="window.handleSubmit(event)" class="space-y-6">
+                                    <div class="bg-white rounded-[2.5rem] p-6 sm:p-8 custom-shadow space-y-6">
+                                        <div class="relative bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] p-10 text-center group cursor-pointer overflow-hidden transition-colors hover:border-blue-300">
+                                            <input type="file" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="window.handleFileSelect(event)">
+                                            <div class="relative z-10">
+                                                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-600 shadow-sm transition-transform group-hover:scale-110"><i data-lucide="image-plus" class="w-6 h-6"></i></div>
+                                                <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">
+                                                    ${state.previews.length ? state.previews.length + ' Foto Terpilih' : 'Pilih Gambar Kegiatan'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        ${state.previews.length ? `<div class="grid grid-cols-5 gap-2 px-2">${state.previews.map(p => `<div class="aspect-square rounded-xl overflow-hidden shadow-sm border border-slate-100"><img src="${p}" class="w-full h-full object-cover"></div>`).join('')}</div>` : (state.isEditMode && state.editData.images ? `<div class="grid grid-cols-5 gap-2 px-2">${state.editData.images.map(p => `<div class="aspect-square rounded-xl overflow-hidden grayscale opacity-30 border border-slate-100"><img src="${p}" class="w-full h-full object-cover"></div>`).join('')}</div>` : '')}
+
+                                        <div class="space-y-4">
+                                            <div class="space-y-1"><label class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest ml-4">Tanggal</label><input type="date" name="date" required value="${state.isEditMode ? state.editData.date : ''}" class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20"></div>
+                                            <div class="space-y-1"><label class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest ml-4">Tema Kegiatan</label><input type="text" name="tema" placeholder="Misal: Belajar Mewarnai Bersama" required value="${state.isEditMode ? state.editData.tema : ''}" class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20"></div>
+                                            <div class="space-y-1"><label class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest ml-4">Deskripsi Lengkap</label><textarea name="description" placeholder="Ceritakan detail kegiatan..." required rows="6" class="w-full bg-slate-50 border-none rounded-[2rem] px-5 py-5 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20 leading-relaxed">${state.isEditMode ? state.editData.description : ''}</textarea></div>
+                                        </div>
+
+                                        <div class="flex gap-3">
+                                            ${state.isEditMode ? `<button type="button" onclick="window.setTab('home')" class="flex-1 bg-slate-100 text-slate-500 font-extrabold py-5 rounded-[1.5rem] uppercase tracking-widest text-xs">Batal</button>` : ''}
+                                            <button type="submit" class="flex-[2] bg-blue-600 text-white font-extrabold py-5 rounded-[1.5rem] shadow-xl shadow-blue-100 hover:bg-blue-700 uppercase tracking-widest text-xs transition-all active:scale-95">
+                                                ${state.isEditMode ? 'Simpan Perubahan' : 'Terbitkan Sekarang'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        `;
+                    }
+                }
+                root.innerHTML = contentHtml;
+                lucide.createIcons();
+            });
+        };
+
+        init();
+    </script>
+</body>
+</html>
