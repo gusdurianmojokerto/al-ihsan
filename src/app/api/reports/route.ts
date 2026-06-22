@@ -1,6 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { jsonResponse } from "@/lib/json-response";
 
+interface Report {
+  id: number;
+  date: Date;
+  tema: string | null;
+  description: string | null;
+  images: string[] | null;
+  likes: number | null;
+  createdAt: Date | null;
+  comments: Array<{ id: number }>;
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -12,17 +23,17 @@ export async function GET(request: Request) {
       include: { comments: true },
     });
 
-    let filtered = reports;
+    let filtered: Report[] = reports as Report[];
 
     if (month && month !== "all") {
-      filtered = filtered.filter((r) => {
+      filtered = filtered.filter((r: Report) => {
         const m = (r.date.getMonth() + 1).toString();
         return m === month;
       });
     }
 
     if (year && year !== "all") {
-      filtered = filtered.filter((r) => {
+      filtered = filtered.filter((r: Report) => {
         const y = r.date.getFullYear().toString();
         return y === year;
       });
