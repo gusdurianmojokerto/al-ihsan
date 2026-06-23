@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Virtuoso } from "react-virtuoso";
 import Navbar from "@/components/Navbar";
 import ReportCard from "@/components/ReportCard";
 import Loading from "@/components/Loading";
@@ -98,20 +99,36 @@ export default function HomePage() {
         </div>
 
         {reports.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-[1400px] mx-auto">
-            {reports.map((r) => (
-              <ReportCard
-                key={r.id}
-                id={r.id}
-                date={r.date}
-                tema={r.tema}
-                description={r.description}
-                images={r.images}
-                likes={r.likes}
-                commentCount={r.comments.length}
-              />
-            ))}
-          </div>
+          <Virtuoso
+            useWindowScroll
+            data={reports}
+            totalCount={reports.length}
+            itemContent={(index, r) => (
+              <div className="px-3 pb-6">
+                <ReportCard
+                  key={r.id}
+                  id={r.id}
+                  date={r.date}
+                  tema={r.tema}
+                  description={r.description}
+                  images={r.images}
+                  likes={r.likes}
+                  commentCount={r.comments.length}
+                />
+              </div>
+            )}
+            components={{
+              List: ({ children, ...props }) => (
+                <div
+                  {...props}
+                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-0 max-w-[1400px] mx-auto"
+                  style={{ willChange: 'transform' }}
+                >
+                  {children}
+                </div>
+              ),
+            }}
+          />
         ) : (
           <div className="py-24 text-center flex flex-col items-center opacity-40">
             <p className="text-sm lg:text-base font-bold text-slate-400 uppercase tracking-widest">

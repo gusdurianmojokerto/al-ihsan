@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import Link from "next/link";
 import { Calendar, Heart, MessageCircle, Layers, Edit2, Trash2 } from "lucide-react";
 
@@ -17,7 +17,7 @@ interface ReportCardProps {
   commentCount: number;
 }
 
-export default function ReportCard({
+function ReportCard({
   id,
   date,
   tema,
@@ -158,3 +158,5 @@ export default function ReportCard({
     </div>
   );
 }
+
+export default memo(ReportCard);
