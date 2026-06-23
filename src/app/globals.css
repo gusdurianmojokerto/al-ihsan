@@ -92,16 +92,15 @@ body {
 .image-aspect-box {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 10;
   background-color: #e2e8f0;
   overflow: hidden;
-  border-radius: 1.5rem;
+  border-radius: 1rem;
 }
 
 @media (min-width: 1024px) {
   .image-aspect-box {
-    aspect-ratio: 16 / 10;
-    border-radius: 1.75rem;
+    border-radius: 1.25rem;
   }
 }
 

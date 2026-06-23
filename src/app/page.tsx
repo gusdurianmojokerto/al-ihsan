@@ -59,7 +59,7 @@ export default function HomePage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-[1800px] mx-auto px-5 sm:px-8 lg:px-12 pb-24">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <header className="mb-12 lg:mb-16 text-center pt-6">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-slate-800 mb-5 lg:mb-6">
             Membangun{" "}
@@ -98,7 +98,7 @@ export default function HomePage() {
         </div>
 
         {reports.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-[1400px] mx-auto">
             {reports.map((r) => (
               <ReportCard
                 key={r.id}

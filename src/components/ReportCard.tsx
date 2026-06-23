@@ -51,12 +51,12 @@ export default function ReportCard({
 
   return (
     <div className="report-card-container animate-fade-in">
-      <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-3xl lg:rounded-[2rem] overflow-hidden custom-shadow group h-full flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+      <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-2xl lg:rounded-3xl overflow-hidden custom-shadow group h-full flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
         <div>
-          <div className="p-6 lg:p-8 flex items-center justify-between">
+          <div className="p-4 lg:p-5 flex items-center justify-between">
             <div className="flex items-center gap-3 lg:gap-4">
-              <div className="w-11 h-11 lg:w-14 lg:h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                <Calendar className="w-5 h-5 lg:w-7 lg:h-7" />
+              <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <Calendar className="w-4 h-4 lg:w-5 lg:h-5" />
               </div>
               <p className="text-xs lg:text-sm font-bold text-slate-400 uppercase tracking-wider">
                 {dateObj.toLocaleDateString("id-ID", {
@@ -70,21 +70,21 @@ export default function ReportCard({
               <div className="flex gap-2 lg:gap-3">
                 <button
                   onClick={handleEdit}
-                  className="p-3 lg:p-4 text-blue-500 bg-blue-50 rounded-xl lg:rounded-2xl hover:bg-blue-100 active:scale-90 transition-all"
+                  className="p-2 lg:p-2.5 text-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 active:scale-90 transition-all"
                 >
-                  <Edit2 className="w-5 h-5 lg:w-6 lg:h-6" />
+                  <Edit2 className="w-4 h-4 lg:w-5 lg:h-5" />
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="p-3 lg:p-4 text-red-500 bg-red-50 rounded-xl lg:rounded-2xl hover:bg-red-100 active:scale-90 transition-all"
+                  className="p-2 lg:p-2.5 text-red-500 bg-red-50 rounded-xl hover:bg-red-100 active:scale-90 transition-all"
                 >
-                  <Trash2 className="w-5 h-5 lg:w-6 lg:h-6" />
+                  <Trash2 className="w-4 h-4 lg:w-5 lg:h-5" />
                 </button>
               </div>
             )}
           </div>
 
-          <Link href={`/detail/${id}`} className="px-6 lg:px-8 block">
+          <Link href={`/detail/${id}`} className="px-4 lg:px-5 block">
             <div className="image-aspect-box mb-1">
               <div className="img-placeholder"></div>
               <img
@@ -98,26 +98,26 @@ export default function ReportCard({
                 }}
               />
               {images && images.length > 1 ? (
-                <div className="absolute top-5 right-5 lg:top-6 lg:right-6 bg-white/90 backdrop-blur px-4 py-2.5 lg:px-6 lg:py-3 rounded-full lg:rounded-2xl flex items-center gap-2 shadow-md z-10">
-                  <Layers className="w-4 h-4 lg:w-5 lg:h-5 text-blue-600" />
-                  <span className="text-sm lg:text-base font-bold text-slate-600">
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md z-10">
+                  <Layers className="w-3.5 h-3.5 text-blue-600" />
+                  <span className="text-xs font-bold text-slate-600">
                     {images.length} Foto
                   </span>
                 </div>
               ) : null}
             </div>
-            <div className="py-6 lg:py-8">
-              <h3 className="text-lg lg:text-xl xl:text-2xl font-extrabold text-slate-800 leading-snug mb-3 lg:mb-4 group-hover:text-blue-600 transition-colors line-clamp-2">
+            <div className="py-4 lg:py-5">
+              <h3 className="text-base lg:text-lg font-extrabold text-slate-800 leading-snug mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
                 {tema}
               </h3>
-              <p className="text-sm lg:text-base xl:text-lg text-slate-500 line-clamp-3 leading-relaxed">
+              <p className="text-xs lg:text-sm text-slate-500 line-clamp-2 leading-relaxed">
                 {description}
               </p>
             </div>
           </Link>
         </div>
 
-        <div className="px-6 lg:px-8 pb-6 lg:pb-8 flex items-center justify-between border-t border-slate-50 pt-5 mt-auto">
+        <div className="px-4 lg:px-5 pb-4 lg:pb-5 flex items-center justify-between border-t border-slate-100 pt-3 mt-auto">
           <div className="flex items-center gap-5 lg:gap-6">
             <button
               onClick={async () => {
@@ -126,30 +126,30 @@ export default function ReportCard({
               }}
               className="flex items-center gap-2.5 group/btn hover:scale-105 transition-transform"
             >
-              <div className="w-11 h-11 lg:w-14 lg:h-14 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 transition-all active:scale-125">
+              <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 transition-all active:scale-125">
                 <Heart
-                  className={`w-5 h-5 lg:w-7 lg:h-7 ${(likes || 0) > 0 ? "fill-rose-500" : ""}`}
+                  className={`w-4 h-4 lg:w-5 lg:h-5 ${(likes || 0) > 0 ? "fill-rose-500" : ""}`}
                 />
               </div>
-              <span className="text-base lg:text-lg font-bold text-slate-600">
+              <span className="text-sm lg:text-base font-bold text-slate-600">
                 {likes || 0}
               </span>
             </button>
             <Link
               href={`/detail/${id}`}
-              className="flex items-center gap-2.5 hover:scale-105 transition-transform"
+              className="flex items-center gap-2 hover:scale-105 transition-transform"
             >
-              <div className="w-11 h-11 lg:w-14 lg:h-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-                <MessageCircle className="w-5 h-5 lg:w-7 lg:h-7" />
+              <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                <MessageCircle className="w-4 h-4 lg:w-5 lg:h-5" />
               </div>
-              <span className="text-base lg:text-lg font-bold text-slate-600">
+              <span className="text-sm lg:text-base font-bold text-slate-600">
                 {commentCount}
               </span>
             </Link>
           </div>
           <Link
             href={`/detail/${id}`}
-            className="text-xs lg:text-sm font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50 px-5 py-3 lg:px-7 lg:py-4 rounded-xl lg:rounded-2xl hover:bg-blue-100 transition-colors"
+            className="text-xs font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
           >
             Detail
           </Link>
