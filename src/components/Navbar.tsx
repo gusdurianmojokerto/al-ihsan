@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Info, PlusCircle } from "lucide-react";
+import { LayoutGrid, Info, PlusCircle, BookOpen } from "lucide-react";
 import { LOGO_URL } from "@/lib/constants";
 
 export default function Navbar() {
@@ -40,9 +40,15 @@ export default function Navbar() {
           <div className="flex bg-slate-100/50 p-1 lg:p-1.5 rounded-xl lg:rounded-2xl gap-0.5">
             <Link
               href="/"
-              className={`nav-btn px-2.5 py-2 lg:px-4 lg:py-3 ${isActive("/") && !isActive("/about") && !isActive("/admin") && !isActive("/detail") ? "active" : ""}`}
+              className={`nav-btn px-2.5 py-2 lg:px-4 lg:py-3 ${isActive("/") && !isActive("/about") && !isActive("/admin") && !isActive("/detail") && !isActive("/modul") ? "active" : ""}`}
             >
               <LayoutGrid className="w-4 h-4 lg:w-5 lg:h-5" />
+            </Link>
+            <Link
+              href="/modul"
+              className={`nav-btn px-2.5 py-2 lg:px-4 lg:py-3 ${isActive("/modul") ? "active" : ""}`}
+            >
+              <BookOpen className="w-4 h-4 lg:w-5 lg:h-5" />
             </Link>
             <Link
               href="/about"

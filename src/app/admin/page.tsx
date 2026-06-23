@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ShieldCheck, UserCheck, ImagePlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ShieldCheck, UserCheck, ImagePlus, Settings } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Loading from "@/components/Loading";
 import { showToast } from "@/lib/utils";
@@ -16,6 +17,7 @@ interface Report {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(true);
@@ -256,12 +258,22 @@ export default function AdminPage() {
             </div>
             <p className="text-xs lg:text-sm font-extrabold text-slate-700">Mode Pengurus</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="text-xs font-bold text-red-500 bg-red-50 border border-red-100 px-4 py-2 rounded-xl uppercase tracking-tighter hover:bg-red-100 transition-colors"
-          >
-            Keluar
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => router.push("/admin/modul")}
+              className="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-blue-100 transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              Atur Modul
+            </button>
+            <button
+              onClick={handleLogout}
+              className="text-xs font-bold text-red-500 bg-red-50 border border-red-100 px-4 py-2 rounded-xl uppercase tracking-tighter hover:bg-red-100 transition-colors"
+            >
+              Keluar
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
