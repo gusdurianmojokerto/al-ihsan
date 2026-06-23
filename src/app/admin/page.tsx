@@ -213,12 +213,12 @@ export default function AdminPage() {
     return (
       <>
         <Navbar />
-        <div className="max-w-xs mx-auto py-20 px-5 text-center">
-          <div className="bg-white rounded-[3rem] p-10 custom-shadow">
-            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-blue-500">
-              <ShieldCheck className="w-8 h-8" />
+        <div className="max-w-lg mx-auto px-4 py-16 text-center">
+          <div className="bg-white rounded-3xl p-8 custom-shadow">
+            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-blue-500">
+              <ShieldCheck className="w-6 h-6" />
             </div>
-            <h2 className="font-extrabold text-lg mb-6 text-slate-800 uppercase tracking-widest leading-tight">
+            <h2 className="font-extrabold text-base mb-5 text-slate-800 uppercase tracking-widest leading-tight">
               Keamanan
               <br />
               Pengurus
@@ -229,11 +229,11 @@ export default function AdminPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              className="w-full bg-slate-50 border-none rounded-2xl p-5 text-center text-xl font-extrabold mb-4 outline-none focus:ring-2 focus:ring-blue-500 tracking-[0.3em] transition-all"
+              className="w-full bg-slate-50 border-none rounded-xl p-4 text-center text-lg font-extrabold mb-3 outline-none focus:ring-2 focus:ring-blue-500 tracking-[0.3em] transition-all"
             />
             <button
               onClick={handleLogin}
-              className="w-full bg-blue-600 text-white font-extrabold py-5 rounded-2xl shadow-xl shadow-blue-100 text-xs tracking-widest uppercase active:scale-95 transition-all"
+              className="w-full bg-blue-600 text-white font-extrabold py-4 rounded-xl shadow-xl shadow-blue-100 text-xs tracking-widest uppercase active:scale-95 transition-all"
             >
               Verifikasi
             </button>
@@ -248,25 +248,25 @@ export default function AdminPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 lg:px-12 pb-24">
-        <div className="flex justify-between items-center mb-10 bg-white/50 p-5 lg:p-6 rounded-3xl lg:rounded-[3rem]">
-          <div className="flex items-center gap-4 lg:gap-5">
-            <div className="w-11 h-11 lg:w-14 lg:h-14 bg-blue-500 rounded-full flex items-center justify-center text-white">
-              <UserCheck className="w-5 h-5 lg:w-7 lg:h-7" />
+      <div className="max-w-lg mx-auto px-4 pb-24">
+        <div className="flex justify-between items-center mb-6 bg-white/50 p-4 rounded-2xl">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white">
+              <UserCheck className="w-4 h-4" />
             </div>
-            <p className="text-sm lg:text-base font-extrabold text-slate-700">Mode Pengurus</p>
+            <p className="text-xs lg:text-sm font-extrabold text-slate-700">Mode Pengurus</p>
           </div>
           <button
             onClick={handleLogout}
-            className="text-xs lg:text-sm font-bold text-red-500 bg-red-50 border border-red-100 px-5 py-2.5 lg:px-6 lg:py-3 rounded-xl lg:rounded-2xl uppercase tracking-tighter hover:bg-red-100 transition-colors"
+            className="text-xs font-bold text-red-500 bg-red-50 border border-red-100 px-4 py-2 rounded-xl uppercase tracking-tighter hover:bg-red-100 transition-colors"
           >
             Keluar
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="bg-white rounded-[3rem] lg:rounded-[4rem] p-8 sm:p-10 lg:p-14 custom-shadow space-y-8">
-            <div className="relative bg-slate-50 border-2 border-dashed border-slate-200 rounded-[3rem] p-12 lg:p-16 text-center group cursor-pointer overflow-hidden transition-colors hover:border-blue-300">
+          <div className="bg-white rounded-3xl p-6 custom-shadow space-y-6">
+            <div className="relative bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center group cursor-pointer overflow-hidden transition-colors hover:border-blue-300">
               <input
                 type="file"
                 multiple
@@ -275,10 +275,10 @@ export default function AdminPage() {
                 onChange={handleFileSelect}
               />
               <div className="relative z-10">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 text-blue-600 shadow-sm transition-transform group-hover:scale-110">
-                  <ImagePlus className="w-8 h-8 lg:w-10 lg:h-10" />
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-600 shadow-sm transition-transform group-hover:scale-110">
+                  <ImagePlus className="w-6 h-6" />
                 </div>
-                <p className="text-sm lg:text-base font-extrabold text-slate-500 uppercase tracking-widest">
+                <p className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">
                   {previews.length
                     ? previews.length + " Foto Terpilih"
                     : "Pilih Gambar Kegiatan"}
@@ -287,11 +287,11 @@ export default function AdminPage() {
             </div>
 
             {previews.length > 0 && (
-              <div className="grid grid-cols-5 gap-3 lg:gap-4 px-2">
+              <div className="grid grid-cols-5 gap-2">
                 {previews.map((p, i) => (
                   <div
                     key={i}
-                    className={`aspect-square rounded-2xl overflow-hidden shadow-sm border border-slate-100 ${isEditing && !p.startsWith("blob:") ? "grayscale opacity-30" : ""}`}
+                    className={`aspect-square rounded-xl overflow-hidden shadow-sm border border-slate-100 ${isEditing && !p.startsWith("blob:") ? "grayscale opacity-30" : ""}`}
                   >
                     <img
                       src={p}
@@ -305,9 +305,9 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-xs lg:text-sm font-extrabold text-slate-400 uppercase tracking-widest ml-5">
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] lg:text-xs font-extrabold text-slate-400 uppercase tracking-widest ml-4">
                   Tanggal
                 </label>
                 <input
@@ -315,11 +315,11 @@ export default function AdminPage() {
                   required
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full bg-slate-50 border-none rounded-3xl px-6 py-5 lg:px-7 lg:py-6 text-base lg:text-lg font-bold outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs lg:text-sm font-extrabold text-slate-400 uppercase tracking-widest ml-5">
+              <div className="space-y-1.5">
+                <label className="text-[10px] lg:text-xs font-extrabold text-slate-400 uppercase tracking-widest ml-4">
                   Tema Kegiatan
                 </label>
                 <input
@@ -328,25 +328,25 @@ export default function AdminPage() {
                   required
                   value={tema}
                   onChange={(e) => setTema(e.target.value)}
-                  className="w-full bg-slate-50 border-none rounded-3xl px-6 py-5 lg:px-7 lg:py-6 text-base lg:text-lg font-bold outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs lg:text-sm font-extrabold text-slate-400 uppercase tracking-widest ml-5">
+              <div className="space-y-1.5">
+                <label className="text-[10px] lg:text-xs font-extrabold text-slate-400 uppercase tracking-widest ml-4">
                   Deskripsi Lengkap
                 </label>
                 <textarea
                   placeholder="Ceritakan detail kegiatan..."
                   required
-                  rows={6}
+                  rows={4}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-slate-50 border-none rounded-[3rem] px-6 py-6 lg:px-7 lg:py-7 text-base lg:text-lg font-medium outline-none focus:ring-2 focus:ring-blue-500/20 leading-relaxed"
+                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/20 leading-relaxed resize-none"
                 />
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {isEditing && (
                 <button
                   type="button"
@@ -358,7 +358,7 @@ export default function AdminPage() {
                     setFiles([]);
                     setPreviews([]);
                   }}
-                  className="flex-1 bg-slate-100 text-slate-500 font-extrabold py-6 lg:py-7 rounded-[2rem] uppercase tracking-widest text-sm lg:text-base hover:bg-slate-200 transition-colors"
+                  className="flex-1 bg-slate-100 text-slate-500 font-extrabold py-4 rounded-xl uppercase tracking-widest text-xs hover:bg-slate-200 transition-colors"
                 >
                   Batal
                 </button>
@@ -366,7 +366,7 @@ export default function AdminPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex-[2] bg-blue-600 text-white font-extrabold py-6 lg:py-7 rounded-[2rem] shadow-xl shadow-blue-100 hover:bg-blue-700 uppercase tracking-widest text-sm lg:text-base transition-all active:scale-95 disabled:opacity-50"
+                className="flex-[2] bg-blue-600 text-white font-extrabold py-4 rounded-xl shadow-xl shadow-blue-100 hover:bg-blue-700 uppercase tracking-widest text-xs transition-all active:scale-95 disabled:opacity-50"
               >
                 {submitText ||
                   (isEditing ? "Simpan Perubahan" : "Terbitkan Sekarang")}

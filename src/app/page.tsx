@@ -60,21 +60,21 @@ export default function HomePage() {
     <>
       <Navbar />
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <header className="mb-12 lg:mb-16 text-center pt-6">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-slate-800 mb-5 lg:mb-6">
+        <header className="mb-8 lg:mb-12 text-center pt-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight text-slate-800 mb-3 lg:mb-4">
             Membangun{" "}
             <span className="shimmer-text">Masa Depan</span>
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-slate-500 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
             Melihat kembali senyum dan semangat belajar adik-adik Al Ihsan
           </p>
         </header>
 
-        <div className="flex gap-4 pb-12 justify-center sticky top-28 z-40 px-2 pointer-events-none">
+        <div className="flex gap-3 pb-8 justify-center sticky top-24 z-40">
           <select
             value={filterMonth}
             onChange={(e) => setFilterMonth(e.target.value)}
-            className="glass pointer-events-auto border-none rounded-2xl lg:rounded-3xl px-7 pr-14 py-4 lg:py-5 text-sm lg:text-base font-extrabold shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+            className="glass border-none rounded-xl px-4 pr-10 py-3 text-xs lg:text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
           >
             <option value="all">Semua Bulan</option>
             {MONTHS.map((m, i) => (
@@ -86,7 +86,7 @@ export default function HomePage() {
           <select
             value={filterYear}
             onChange={(e) => setFilterYear(e.target.value)}
-            className="glass pointer-events-auto border-none rounded-2xl lg:rounded-3xl px-7 pr-14 py-4 lg:py-5 text-sm lg:text-base font-extrabold shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+            className="glass border-none rounded-xl px-4 pr-10 py-3 text-xs lg:text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
           >
             <option value="all">Semua Tahun</option>
             {availableYears.map((y) => (
@@ -113,8 +113,8 @@ export default function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="py-40 text-center flex flex-col items-center opacity-40">
-            <p className="text-lg lg:text-xl font-bold text-slate-400 uppercase tracking-widest">
+          <div className="py-24 text-center flex flex-col items-center opacity-40">
+            <p className="text-sm lg:text-base font-bold text-slate-400 uppercase tracking-widest">
               Laporan tidak ditemukan
             </p>
           </div>
