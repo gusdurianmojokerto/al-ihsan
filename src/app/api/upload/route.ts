@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import sharp from "sharp";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(request: Request) {
   try {
@@ -12,23 +11,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const inputBuffer = Buffer.from(bytes);
+    const inputBuffer = Buffer.from(await file.arrayBuffer());
 
     const outputBuffer = await sharp(inputBuffer)
-      .resize(1000, 1000, { fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: 80 })
+      .resize(1200, 1200, { fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 80 })
       .toBuffer();
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
+    const fileName = `alihsan_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.webp`;
 
-    const fileName = `alihsan_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.jpg`;
-    const filePath = path.join(uploadDir, fileName);
+    const { error } = await supabase.storage
+      .from("images")
+      .upload(fileName, outputBuffer, {
+        contentType: "image/webp",
+        upsert: false,
+      });
 
-    await writeFile(filePath, outputBuffer);
+    if (error) {
+      console.error("Supabase upload error:", error.message, error);
+      return NextResponse.json({ error: `Upload failed: ${error.message}` }, { status: 500 });
+    }
 
-    return NextResponse.json({ url: `/uploads/${fileName}` });
+    const { data: urlData } = supabase.storage
+      .from("images")
+      .getPublicUrl(fileName);
+
+    return NextResponse.json({ url: urlData.publicUrl });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
