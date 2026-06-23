@@ -15,6 +15,63 @@ interface Module {
   order: number;
 }
 
+const defaultModules: Module[] = [
+  {
+    id: 1,
+    title: "Modul Pedoman Tutor",
+    description: "Panduan lengkap untuk tutor",
+    pdfFile: "/modul/modul_pedoman_tutor.pdf",
+    pages: 8,
+    cover: "bg-gradient-to-br from-blue-500 to-cyan-500",
+    order: 1
+  },
+  {
+    id: 2,
+    title: "Modul Pedoman Konseptual Visual",
+    description: "Kerangka pembelajaran abad 21",
+    pdfFile: "/modul/Modul_Pedoman_Konseptual_Visual.pdf",
+    pages: 18,
+    cover: "bg-gradient-to-br from-purple-500 to-pink-500",
+    order: 2
+  },
+  {
+    id: 3,
+    title: "Modul Al Ihsan V2 Clean",
+    description: "Modul pembelajaran lengkap",
+    pdfFile: "/modul/Modul_Al_Ihsan_V2_Clean.pdf",
+    pages: 36,
+    cover: "bg-gradient-to-br from-green-500 to-teal-500",
+    order: 3
+  },
+  {
+    id: 4,
+    title: "Modul Ice Breaking Terpadu",
+    description: "10 aktivitas ice breaking",
+    pdfFile: "/modul/Modul_Ice_Breaking_Terpadu_Al_Ihsan.pdf",
+    pages: 10,
+    cover: "bg-gradient-to-br from-orange-500 to-red-500",
+    order: 4
+  },
+  {
+    id: 5,
+    title: "Modul Studi Kasus Rumah Belajar",
+    description: "Studi kasus implementasi",
+    pdfFile: "/modul/Modul_Studi_Kasus_Rumah_Belajar_Al-Ihsan.pdf",
+    pages: 12,
+    cover: "bg-gradient-to-br from-indigo-500 to-blue-500",
+    order: 5
+  },
+  {
+    id: 6,
+    title: "Master Modul Monitoring",
+    description: "Instrumen monitoring dan evaluasi",
+    pdfFile: "/modul/Master_Modul_Monitoring_7_Halaman.pdf",
+    pages: 7,
+    cover: "bg-gradient-to-br from-pink-500 to-rose-500",
+    order: 6
+  }
+];
+
 export default function AdminModulePage() {
   const router = useRouter();
   const [modules, setModules] = useState<Module[]>([]);
@@ -22,67 +79,23 @@ export default function AdminModulePage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const savedOrder = localStorage.getItem("modulOrder");
-    if (savedOrder) {
-      setModules(JSON.parse(savedOrder));
-    } else {
-      setModules([
-        {
-          id: 1,
-          title: "Modul Pedoman Tutor",
-          description: "Panduan lengkap untuk tutor",
-          pdfFile: "/modul/modul_pedoman_tutor.pdf",
-          pages: 8,
-          cover: "bg-gradient-to-br from-blue-500 to-cyan-500",
-          order: 1
-        },
-        {
-          id: 2,
-          title: "Modul Pedoman Konseptual Visual",
-          description: "Kerangka pembelajaran abad 21",
-          pdfFile: "/modul/Modul_Pedoman_Konseptual_Visual.pdf",
-          pages: 18,
-          cover: "bg-gradient-to-br from-purple-500 to-pink-500",
-          order: 2
-        },
-        {
-          id: 3,
-          title: "Modul Al Ihsan V2 Clean",
-          description: "Modul pembelajaran lengkap",
-          pdfFile: "/modul/Modul_Al_Ihsan_V2_Clean.pdf",
-          pages: 36,
-          cover: "bg-gradient-to-br from-green-500 to-teal-500",
-          order: 3
-        },
-        {
-          id: 4,
-          title: "Modul Ice Breaking Terpadu",
-          description: "10 aktivitas ice breaking",
-          pdfFile: "/modul/Modul_Ice_Breaking_Terpadu_Al_Ihsan.pdf",
-          pages: 10,
-          cover: "bg-gradient-to-br from-orange-500 to-red-500",
-          order: 4
-        },
-        {
-          id: 5,
-          title: "Modul Studi Kasus Rumah Belajar",
-          description: "Studi kasus implementasi",
-          pdfFile: "/modul/Modul_Studi_Kasus_Rumah_Belajar_Al-Ihsan.pdf",
-          pages: 12,
-          cover: "bg-gradient-to-br from-indigo-500 to-blue-500",
-          order: 5
-        },
-        {
-          id: 6,
-          title: "Master Modul Monitoring",
-          description: "Instrumen monitoring dan evaluasi",
-          pdfFile: "/modul/Master_Modul_Monitoring_7_Halaman.pdf",
-          pages: 7,
-          cover: "bg-gradient-to-br from-pink-500 to-rose-500",
-          order: 6
+    fetch("/api/modul")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const orderMap = new Map(data.map((item: any) => [item.moduleId, item.order]));
+          const sortedModules = [...defaultModules].map((module) => ({
+            ...module,
+            order: orderMap.get(module.id) || module.order
+          })).sort((a, b) => a.order - b.order);
+          setModules(sortedModules);
+        } else {
+          setModules(defaultModules);
         }
-      ]);
-    }
+      })
+      .catch(() => {
+        setModules(defaultModules);
+      });
   }, []);
 
   const handleDragStart = (index: number) => {
@@ -110,13 +123,28 @@ export default function AdminModulePage() {
     setDraggedIndex(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaving(true);
-    localStorage.setItem("modulOrder", JSON.stringify(modules));
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/modul", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          modules: modules.map((m) => ({ id: m.id, order: m.order }))
+        })
+      });
+
+      if (response.ok) {
+        alert("Urutan modul berhasil disimpan ke database!");
+      } else {
+        throw new Error("Gagal menyimpan");
+      }
+    } catch (error) {
+      alert("Gagal menyimpan urutan modul. Coba lagi.");
+      console.error(error);
+    } finally {
       setSaving(false);
-      alert("Urutan modul berhasil disimpan!");
-    }, 500);
+    }
   };
 
   return (

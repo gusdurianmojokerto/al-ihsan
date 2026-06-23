@@ -385,7 +385,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   comments: 'comments',
-  reports: 'reports'
+  reports: 'reports',
+  module_order: 'module_order'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,7 +402,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "comments" | "reports"
+    modelProps: "comments" | "reports" | "module_order"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -553,6 +554,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    module_order: {
+      payload: Prisma.$module_orderPayload<ExtArgs>
+      fields: Prisma.module_orderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.module_orderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.module_orderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload>
+        }
+        findFirst: {
+          args: Prisma.module_orderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.module_orderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload>
+        }
+        findMany: {
+          args: Prisma.module_orderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload>[]
+        }
+        create: {
+          args: Prisma.module_orderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload>
+        }
+        createMany: {
+          args: Prisma.module_orderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.module_orderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload>[]
+        }
+        delete: {
+          args: Prisma.module_orderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload>
+        }
+        update: {
+          args: Prisma.module_orderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload>
+        }
+        deleteMany: {
+          args: Prisma.module_orderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.module_orderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.module_orderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload>[]
+        }
+        upsert: {
+          args: Prisma.module_orderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$module_orderPayload>
+        }
+        aggregate: {
+          args: Prisma.Module_orderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateModule_order>
+        }
+        groupBy: {
+          args: Prisma.module_orderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Module_orderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.module_orderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Module_orderCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -615,6 +690,16 @@ export const ReportsScalarFieldEnum = {
 } as const
 
 export type ReportsScalarFieldEnum = (typeof ReportsScalarFieldEnum)[keyof typeof ReportsScalarFieldEnum]
+
+
+export const Module_orderScalarFieldEnum = {
+  id: 'id',
+  moduleId: 'moduleId',
+  order: 'order',
+  updatedAt: 'updatedAt'
+} as const
+
+export type Module_orderScalarFieldEnum = (typeof Module_orderScalarFieldEnum)[keyof typeof Module_orderScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -859,6 +944,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   comments?: Prisma.commentsOmit
   reports?: Prisma.reportsOmit
+  module_order?: Prisma.module_orderOmit
 }
 
 /* Types for Logging */

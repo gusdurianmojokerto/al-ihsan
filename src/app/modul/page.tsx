@@ -76,15 +76,23 @@ export default function ModulePage() {
   const [modules, setModules] = useState<Module[]>(defaultModules);
 
   useEffect(() => {
-    const savedOrder = localStorage.getItem("modulOrder");
-    if (savedOrder) {
-      try {
-        const parsedModules = JSON.parse(savedOrder);
-        setModules(parsedModules.sort((a: Module, b: Module) => a.order - b.order));
-      } catch (e) {
+    fetch("/api/modul")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const orderMap = new Map(data.map((item: any) => [item.moduleId, item.order]));
+          const sortedModules = defaultModules.map((module) => ({
+            ...module,
+            order: orderMap.get(module.id) || module.order
+          })).sort((a, b) => a.order - b.order);
+          setModules(sortedModules);
+        } else {
+          setModules(defaultModules);
+        }
+      })
+      .catch(() => {
         setModules(defaultModules);
-      }
-    }
+      });
   }, []);
 
   const filteredModules = modules.filter(module => 

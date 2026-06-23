@@ -29,3 +29,14 @@ model reports {
   description String?
   comments    comments[]
 }
+
+/// This model stores module ordering configuration
+model module_order {
+  id        BigInt   @id @default(autoincrement())
+  moduleId  Int
+  order     Int
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@unique([moduleId])
+  @@map("module_order")
+}

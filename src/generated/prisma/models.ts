@@ -10,4 +10,5 @@
  */
 export type * from './models/comments'
 export type * from './models/reports'
+export type * from './models/module_order'
 export type * from './commonInputTypes'

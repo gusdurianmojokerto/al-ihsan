@@ -27,3 +27,8 @@ export type comments = Prisma.commentsModel
  * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
  */
 export type reports = Prisma.reportsModel
+/**
+ * Model module_order
+ * This model stores module ordering configuration
+ */
+export type module_order = Prisma.module_orderModel

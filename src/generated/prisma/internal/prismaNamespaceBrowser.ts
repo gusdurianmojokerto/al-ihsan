@@ -52,7 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   comments: 'comments',
-  reports: 'reports'
+  reports: 'reports',
+  module_order: 'module_order'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -94,6 +95,16 @@ export const ReportsScalarFieldEnum = {
 } as const
 
 export type ReportsScalarFieldEnum = (typeof ReportsScalarFieldEnum)[keyof typeof ReportsScalarFieldEnum]
+
+
+export const Module_orderScalarFieldEnum = {
+  id: 'id',
+  moduleId: 'moduleId',
+  order: 'order',
+  updatedAt: 'updatedAt'
+} as const
+
+export type Module_orderScalarFieldEnum = (typeof Module_orderScalarFieldEnum)[keyof typeof Module_orderScalarFieldEnum]
 
 
 export const SortOrder = {
