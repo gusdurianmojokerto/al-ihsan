@@ -98,7 +98,7 @@ export default function HomePage() {
         </div>
 
         {reports.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7 lg:gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-7">
             {reports.map((r) => (
               <ReportCard
                 key={r.id}

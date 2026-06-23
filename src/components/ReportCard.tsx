@@ -51,7 +51,7 @@ export default function ReportCard({
 
   return (
     <div className="report-card-container animate-fade-in">
-      <div className="bg-white/75 backdrop-blur-sm border border-white rounded-[3rem] lg:rounded-[4rem] overflow-hidden custom-shadow group h-full flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
+      <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-3xl lg:rounded-[2rem] overflow-hidden custom-shadow group h-full flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
         <div>
           <div className="p-6 lg:p-8 flex items-center justify-between">
             <div className="flex items-center gap-3 lg:gap-4">
