@@ -41,23 +41,34 @@ function ImageSlider({ images }: { images: string[] }) {
     [images.length]
   );
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = e.touches[0].clientX;
+  const handleStart = (clientX: number) => {
+    touchStart.current = clientX;
     isDragging.current = true;
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleMove = (clientX: number) => {
     if (!isDragging.current) return;
-    touchDelta.current = e.touches[0].clientX - touchStart.current;
+    touchDelta.current = clientX - touchStart.current;
   };
 
-  const handleTouchEnd = () => {
+  const handleEnd = () => {
     if (!isDragging.current) return;
     isDragging.current = false;
     if (touchDelta.current > 50) goTo(current - 1);
     else if (touchDelta.current < -50) goTo(current + 1);
     touchDelta.current = 0;
   };
+
+  const handleTouchStart = (e: React.TouchEvent) => handleStart(e.touches[0].clientX);
+  const handleTouchMove = (e: React.TouchEvent) => handleMove(e.touches[0].clientX);
+  const handleTouchEnd = () => handleEnd();
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleStart(e.clientX);
+  };
+  const handleMouseMove = (e: React.MouseEvent) => handleMove(e.clientX);
+  const handleMouseUp = () => handleEnd();
 
   if (images.length === 0) {
     return (
@@ -90,20 +101,24 @@ function ImageSlider({ images }: { images: string[] }) {
   return (
     <div className="relative">
       <div
-        className="overflow-hidden rounded-2xl lg:rounded-3xl aspect-[4/3] bg-slate-100 touch-pan-y"
+        className="overflow-hidden rounded-2xl lg:rounded-3xl aspect-[4/3] bg-slate-100 touch-pan-y select-none"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       >
         <div
           className="flex h-full transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
           {images.map((img, i) => (
-            <div key={i} className="min-w-full h-full flex-shrink-0">
+            <div key={i} className="min-w-full h-full shrink-0 relative overflow-hidden bg-slate-100">
               <img
                 src={`/api/images?url=${encodeURIComponent(img)}`}
-                className="w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
                 loading={i === 0 ? "eager" : "lazy"}
                 alt={`Foto ${i + 1}`}
                 onError={(e) => {
