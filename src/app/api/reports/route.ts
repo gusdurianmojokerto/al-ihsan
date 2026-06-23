@@ -2,14 +2,14 @@ import { prisma } from "@/lib/prisma";
 import { jsonResponse } from "@/lib/json-response";
 
 interface Report {
-  id: number;
+  id: bigint;
   date: Date;
   tema: string | null;
   description: string | null;
   images: string[] | null;
-  likes: number | null;
+  likes: bigint | null;
   createdAt: Date | null;
-  comments: Array<{ id: number }>;
+  comments: Array<{ id: bigint }>;
 }
 
 export async function GET(request: Request) {
