@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        model: "step-3.5-flash",
+        model: "glm-5.1",
         stream: true,
         messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
         temperature: 0.7,
