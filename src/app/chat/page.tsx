@@ -46,94 +46,87 @@ export default function ChatPage() {
     }
   }, [input]);
 
+  const fetchChat = async (allMessages: { role: string; content: string }[]): Promise<string> => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 80000);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        signal: controller.signal,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: allMessages }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("No reader");
+
+      const decoder = new TextDecoder();
+      let fullText = "";
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith("data:")) continue;
+          const data = trimmed.slice(5).trim();
+          if (data === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(data);
+            const delta = parsed.choices?.[0]?.delta?.content;
+            if (delta) fullText += delta;
+          } catch {}
+        }
+      }
+
+      return fullText;
+    } finally {
+      clearTimeout(timeout);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    const newMessages = [...messages, { role: "user" as const, content: userMessage }];
+    setMessages(newMessages);
     setIsLoading(true);
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 90000);
+    // Add placeholder
+    setMessages([...newMessages, { role: "assistant", content: "" }]);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        signal: controller.signal,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: [
-            ...messages.map((msg) => ({ role: msg.role, content: msg.content })),
-            { role: "user", content: userMessage },
-          ],
-        }),
-      });
+      const fullText = await fetchChat(
+        newMessages.map((m) => ({ role: m.role, content: m.content }))
+      );
 
-      if (!response.ok) throw new Error("Gagal mendapatkan respon");
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullText = "";
-      let buffer = "";
-
-      // Add placeholder message
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() || "";
-
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
-              if (data === "[DONE]") break;
-              try {
-                const parsed = JSON.parse(data);
-                const delta = parsed.choices?.[0]?.delta?.content;
-                if (delta) {
-                  fullText += delta;
-                  const cleaned = stripMarkdown(fullText);
-                  setMessages((prev) => {
-                    const updated = [...prev];
-                    updated[updated.length - 1] = { role: "assistant", content: cleaned };
-                    return updated;
-                  });
-                }
-              } catch {}
-            }
-          }
-        }
-      }
-
-      if (!fullText) {
-        setMessages((prev) => {
-          const updated = [...prev];
-          updated[updated.length - 1] = { role: "assistant", content: "Maaf, tidak ada respon. Silakan coba lagi." };
-          return updated;
-        });
+      if (fullText) {
+        const cleaned = stripMarkdown(fullText);
+        setMessages([...newMessages, { role: "assistant", content: cleaned }]);
+      } else {
+        setMessages([...newMessages, { role: "assistant", content: "Maaf, tidak ada respon. Silakan coba lagi." }]);
       }
     } catch (error) {
       console.error("Error:", error);
-      setMessages((prev) => {
-        const updated = [...prev];
-        if (updated[updated.length - 1]?.content === "") {
-          updated[updated.length - 1] = { role: "assistant", content: "Maaf, terjadi kesalahan. Silakan coba lagi." };
-        } else {
-          updated.push({ role: "assistant", content: "Maaf, terjadi kesalahan. Silakan coba lagi." });
-        }
-        return updated;
-      });
+      const errMsg = error instanceof Error && error.name === "AbortError"
+        ? "Request timeout. Silakan coba lagi."
+        : "Maaf, terjadi kesalahan. Silakan coba lagi.";
+      setMessages([...newMessages, { role: "assistant", content: errMsg }]);
     } finally {
-      clearTimeout(timeout);
       setIsLoading(false);
     }
   };
