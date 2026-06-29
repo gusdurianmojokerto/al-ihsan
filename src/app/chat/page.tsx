@@ -59,26 +59,17 @@ export default function ChatPage() {
     const timeout = setTimeout(() => controller.abort(), 90000);
 
     try {
-      const response = await fetch("https://api.iamhc.cn/v1/chat/completions", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer sk-k7xS8eAB3FjGcBM52P19xoxZr4qxfcycb1xFGUsaiavvkmSO",
         },
         body: JSON.stringify({
-          model: "glm-4.7",
-          stream: true,
           messages: [
-            {
-              role: "system",
-              content: "Anda adalah pengajar Ramah Al-Ihsan Mojokerto. Paham 21CLD, Taksonomi Bloom, 9 Nilai Gusdurian. Jawab hangat. Jangan mulai salam. Jangan pakai markdown. Gunakan bullet point.",
-            },
             ...messages.map((msg) => ({ role: msg.role, content: msg.content })),
             { role: "user", content: userMessage },
           ],
-          temperature: 0.7,
-          max_tokens: 4096,
         }),
       });
 
