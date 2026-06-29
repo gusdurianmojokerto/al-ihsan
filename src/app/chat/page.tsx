@@ -9,11 +9,21 @@ interface Message {
   content: string;
 }
 
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
+    .replace(/__/g, "")
+    .replace(/_/g, "")
+    .replace(/#{1,6}\s/g, "")
+    .replace(/^\d+\.\s/gm, "• ");
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Assalamualaikum! Saya pengajar Al-Ihsan. Saya siap membantu Anda memahami modul pembelajaran kami yang mengintegrasikan 21CLD, Taksonomi Bloom, dan 9 Nilai Gusdurian. Ada yang ingin ditanyakan?",
+      content: "Saya pengajar Al-Ihsan. Saya siap membantu Anda memahami modul pembelajaran kami tentang 21CLD, Taksonomi Bloom, dan 9 Nilai Gusdurian. Ada yang ingin ditanyakan?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -44,8 +54,9 @@ export default function ChatPage() {
     setInput("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
+
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 60000);
+    const timeout = setTimeout(() => controller.abort(), 90000);
 
     try {
       const response = await fetch("https://api.iamhc.cn/v1/chat/completions", {
@@ -53,40 +64,17 @@ export default function ChatPage() {
         signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer sk-k7xS8eAB3FjGcBM52P19xoxZr4qxfcycb1xFGUsaiavvkmSO",
+          Authorization: "Bearer sk-k7xS8eAB3FjGcBM52P19xoxZr4qxfcycb1xFGUsaiavvkmSO",
         },
         body: JSON.stringify({
           model: "glm-4.7",
+          stream: true,
           messages: [
             {
               role: "system",
-              content: `Anda adalah pengajar di Rumah Belajar Al-Ihsan Mojokerto yang berpengalaman dan ramah. Anda memiliki pemahaman mendalam tentang:
-
-1. 21CLD (21st Century Learning Design) - Keterampilan esensial untuk masa depan seperti Kolaborasi, Konstruksi Pengetahuan, Pemecahan Masalah, Komunikasi Terampil, dan Regulasi Diri.
-
-2. Taksonomi Bloom (C1-C6) - Tangga kognitif untuk mengukur kedalaman berpikir anak dari tingkat mengingat hingga mencipta.
-
-3. 9 Nilai Gusdurian - Pondasi moralitas dan karakter welas asih.
-
-4. Ritual Check-In & Check-Out - Proses transisi mental anak untuk membangun ruang aman.
-
-5. Rubrik Observasi Terintegrasi - Memberikan bukti spesifik dalam observasi pembelajaran.
-
-6. Siklus Intervensi Data-Driven - Pengumpulan, Sintesis, Pivot/Respon, dan Retrospeksi.
-
-Tugas Anda adalah membantu tutor, orang tua, atau siapapun yang bertanya tentang:
-- Cara mengimplementasikan modul pembelajaran
-- Memahami konsep 21CLD, Bloom, dan Nilai Gusdurian
-- Memberikan contoh praktis dan studi kasus
-- Tips fasilitasi pembelajaran yang memanusiakan
-- Cara melakukan observasi dan evaluasi yang efektif
-
-Jawablah dengan bahasa yang hangat, mudah dipahami, dan penuh empati. Gunakan contoh konkret dari konteks Mojokerto jika memungkinkan. JANGAN pernah memulai jawaban dengan salam (Assalamualaikum/Salam). Langsung jawab pertanyaan saja. JANGAN gunakan format markdown seperti **bold**, *italic*, ###, atau simbol lainnya. JANGAN gunakan nomor (1., 2., 3.) untuk list. Gunakan bullet point (•) untuk setiap poin. Tulis biasa saja tanpa formatting.`,
+              content: "Anda adalah pengajar Ramah Al-Ihsan Mojokerto. Paham 21CLD, Taksonomi Bloom, 9 Nilai Gusdurian. Jawab hangat. Jangan mulai salam. Jangan pakai markdown. Gunakan bullet point.",
             },
-            ...messages.map((msg) => ({
-              role: msg.role,
-              content: msg.content,
-            })),
+            ...messages.map((msg) => ({ role: msg.role, content: msg.content })),
             { role: "user", content: userMessage },
           ],
           temperature: 0.7,
@@ -94,34 +82,65 @@ Jawablah dengan bahasa yang hangat, mudah dipahami, dan penuh empati. Gunakan co
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Gagal mendapatkan respon dari AI");
+      if (!response.ok) throw new Error("Gagal mendapatkan respon");
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+      let buffer = "";
+
+      // Add placeholder message
+      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const data = line.slice(6);
+              if (data === "[DONE]") break;
+              try {
+                const parsed = JSON.parse(data);
+                const delta = parsed.choices?.[0]?.delta?.content;
+                if (delta) {
+                  fullText += delta;
+                  const cleaned = stripMarkdown(fullText);
+                  setMessages((prev) => {
+                    const updated = [...prev];
+                    updated[updated.length - 1] = { role: "assistant", content: cleaned };
+                    return updated;
+                  });
+                }
+              } catch {}
+            }
+          }
+        }
       }
 
-      const data = await response.json();
-      let assistantMessage = data.choices[0].message.content || "Maaf, saya tidak dapat merespon saat ini. Silakan coba lagi.";
-      assistantMessage = assistantMessage
-        .replace(/\*\*/g, "")
-        .replace(/\*/g, "")
-        .replace(/__/g, "")
-        .replace(/_/g, "")
-        .replace(/#{1,6}\s/g, "")
-        .replace(/^\d+\.\s/gm, "• ")
-        .replace(/\n\s*[-•]\s/g, "\n• ");
-
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: assistantMessage },
-      ]);
+      if (!fullText) {
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { role: "assistant", content: "Maaf, tidak ada respon. Silakan coba lagi." };
+          return updated;
+        });
+      }
     } catch (error) {
       console.error("Error:", error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Maaf, terjadi kesalahan. Silakan coba lagi.",
-        },
-      ]);
+      setMessages((prev) => {
+        const updated = [...prev];
+        if (updated[updated.length - 1]?.content === "") {
+          updated[updated.length - 1] = { role: "assistant", content: "Maaf, terjadi kesalahan. Silakan coba lagi." };
+        } else {
+          updated.push({ role: "assistant", content: "Maaf, terjadi kesalahan. Silakan coba lagi." });
+        }
+        return updated;
+      });
     } finally {
       clearTimeout(timeout);
       setIsLoading(false);
@@ -180,11 +199,14 @@ Jawablah dengan bahasa yang hangat, mudah dipahami, dan penuh empati. Gunakan co
                   >
                     <p className="whitespace-pre-wrap leading-relaxed">
                       {message.content}
+                      {isLoading && index === messages.length - 1 && message.role === "assistant" && (
+                        <span className="inline-block w-2 h-4 bg-blue-500 ml-1 animate-pulse" />
+                      )}
                     </p>
                   </div>
                 </div>
               ))}
-              {isLoading && (
+              {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
                 <div className="flex gap-3 animate-fade-in">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-slate-100 to-slate-200">
                     <Bot className="w-5 h-5 text-slate-600" />
