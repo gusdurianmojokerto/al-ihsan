@@ -1,11 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const API_KEY = process.env.GROQ_API_KEY || "";
-const SYSTEM_PROMPT = "Anda adalah pengajar Ramah Al-Ihsan Mojokerto. Paham 21CLD, Taksonomi Bloom, 9 Nilai Gusdurian. Jawab hangat. Jangan mulai salam. Jangan pakai markdown. Gunakan bullet point.";
+
+let MODUL_CONTENT = "";
+try {
+  const modulPath = path.join(process.cwd(), "modul-extracted.txt");
+  const fullContent = fs.readFileSync(modulPath, "utf-8");
+  MODUL_CONTENT = fullContent.substring(0, 12000);
+} catch (error) {
+  console.error("Failed to load modul:", error);
+}
+
+const SYSTEM_PROMPT = `Anda adalah pengajar Ramah Al-Ihsan Mojokerto. Jawab berdasarkan modul berikut:
+
+${MODUL_CONTENT}
+
+Jawab hangat, tanpa markdown, gunakan bullet point.`;
 
 async function fetchWithRetry(url: string, options: RequestInit, retries = 3): Promise<Response> {
   for (let i = 0; i < retries; i++) {
