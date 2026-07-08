@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const API_URL = "https://api.iamhc.cn/v1/chat/completions";
-const API_KEY = "sk-k7xS8eAB3FjGcBM52P19xoxZr4qxfcycb1xFGUsaiavvkmSO";
+const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const API_KEY = process.env.GROQ_API_KEY || "";
 const SYSTEM_PROMPT = "Anda adalah pengajar Ramah Al-Ihsan Mojokerto. Paham 21CLD, Taksonomi Bloom, 9 Nilai Gusdurian. Jawab hangat. Jangan mulai salam. Jangan pakai markdown. Gunakan bullet point.";
 
 async function fetchWithRetry(url: string, options: RequestInit, retries = 3): Promise<Response> {
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        model: "glm-5.1",
+        model: "llama-3.3-70b-versatile",
         stream: true,
         messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
         temperature: 0.7,
